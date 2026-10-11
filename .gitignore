@@ -1,0 +1,17 @@
+.terraform/
+
+# State fájlok
+*.tfstate
+*.tfstate.*
+crash.log
+
+# Saját értékek
+terraform.tfvars
+backend.hcl
+
+# Plan fájlok
+*.tfplan
+
+# Privát kulcsok
+*.pem
+*.key
