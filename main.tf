@@ -1,28 +1,52 @@
-variable "aws_region" {
-  default = "eu-central-1"
-}
+# Legfrissebb Amazon Linux 2023 AMI
+data "aws_ami" "al2023" {
+  most_recent = true
+  owners      = ["amazon"]
 
-variable "project_name" {
-  default = "scalable-infra"
-}
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
 
-variable "owner" {
-  default = "kovacs.peter"
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
 }
 
 module "vpc" {
   source = "./modules/vpc"
 
   name_prefix = var.project_name
-  vpc_config  = { cidr_block = "10.0.0.0/16" }
-  subnets = [
-    { name = "public-a", cidr_block = "10.0.1.0/24", az = "eu-central-1a", type = "public", nat_gateway = true },
-    ##{ name = "public-b", cidr_block = "10.0.2.0/24", az = "eu-central-1b", type = "public" },
-    { name = "private-a", cidr_block = "10.0.11.0/24", az = "eu-central-1a", type = "private" },
-    { name = "private-b", cidr_block = "10.0.12.0/24", az = "eu-central-1b", type = "private" },
-  ]
+  vpc_config  = var.vpc_config
+  subnets     = var.subnets
 }
 
-output "subnets" {
-  value = module.vpc.subnets
+module "ec2" {
+  source = "./modules/ec2-instance"
+
+  name_prefix           = var.project_name
+  vpc_id                = module.vpc.vpc_id
+  vpc_cidr              = module.vpc.vpc_cidr_block
+  subnet_ids            = module.vpc.subnet_ids
+  instances_per_subnet  = var.ec2_config
+  ami_id                = data.aws_ami.al2023.id
+  default_instance_type = var.default_instance_type
+  key_pair              = local.key_pair
+
+  # SSH csak a bastion security groupból engedélyezett
+  ssh_source_security_group_ids = [module.bastion.security_group_id]
+}
+
+module "bastion" {
+  source = "./modules/bastion"
+
+  name_prefix           = var.project_name
+  vpc_id                = module.vpc.vpc_id
+  public_subnet_ids     = module.vpc.public_subnet_ids
+  bastions              = var.bastion_config
+  ami_id                = data.aws_ami.al2023.id
+  default_instance_type = var.default_instance_type
+  key_name              = module.ec2.key_name
+  allowed_ssh_cidrs     = var.allowed_ssh_cidrs
 }
