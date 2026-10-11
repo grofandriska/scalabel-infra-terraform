@@ -17,10 +17,10 @@ variable "vpc_config" {
 variable "subnets" {
   description = "Subnetek listája (név, CIDR, AZ, típus, NAT GW kell-e)."
   type = list(object({
-    name        = string    ## Subnet Unique identifer
+    name        = string ## Subnet Unique identifer
     cidr_block  = string
-    az          = string    
-    type        = string    ## Private - Public
-    nat_gateway = optional(bool, false)  ## Makes sense olny on Public type with
+    az          = string
+    type        = string                ## Private - Public
+    nat_gateway = optional(bool, false) ## Makes sense olny on Public type with
   }))
 }

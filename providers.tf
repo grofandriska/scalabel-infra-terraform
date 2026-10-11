@@ -7,7 +7,7 @@ provider "aws" {
       Project   = var.project_name
       ManagedBy = "Terraform"
       Owner     = "Gróf_András"
-      
+
     }
   }
 }
