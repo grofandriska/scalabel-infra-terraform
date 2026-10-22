@@ -1,0 +1,41 @@
+# Másold le: cp terraform.tfvars.example terraform.tfvars
+# majd írd át a saját értékeidre. A terraform.tfvars a .gitignore miatt nem kerül fel a repóba.
+
+project_name = "scalable-infra"
+aws_region   = "eu-central-1"
+owner        = "Vezetéknév Keresztnév" # tagként kerül minden erőforrásra
+
+vpc_config = {
+  cidr_block = "10.0.0.0/16"
+}
+
+# A "name" egyedi kulcs, erre hivatkozik az ec2_config és a bastion_config.
+subnets = [
+  { name = "public-a", cidr_block = "10.0.1.0/24", az = "eu-central-1a", type = "public", nat_gateway = true },
+  { name = "public-b", cidr_block = "10.0.2.0/24", az = "eu-central-1b", type = "public" },
+  { name = "private-a", cidr_block = "10.0.11.0/24", az = "eu-central-1a", type = "private" },
+  { name = "private-b", cidr_block = "10.0.12.0/24", az = "eu-central-1b", type = "private" },
+]
+
+# Subnet név => hány privát EC2 legyen benne (instance_type opcionális)
+ec2_config = {
+  "private-a" = { instance_count = 2 }
+  "private-b" = { instance_count = 1, instance_type = "t3.small" }
+}
+
+# Bastion hostok, mindegyik egy public subnetben
+bastion_config = [
+  { name = "bastion-a", subnet = "public-a" },
+  { name = "bastion-b", subnet = "public-b" },
+]
+
+key_pair = {
+  name            = "scalable-infra-key"
+  public_key_path = "~/.ssh/id_ed25519.pub"
+}
+
+# A saját IP-d /32-vel: curl -s https://checkip.amazonaws.com
+# A 0.0.0.0/0-t a validáció tiltja.
+allowed_ssh_cidrs = ["203.0.113.10/32"]
+
+default_instance_type = "t3.micro"

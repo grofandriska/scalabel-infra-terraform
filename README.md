@@ -41,7 +41,8 @@ Forgalom:
 │   ├── vpc/                    # VPC, subnetek, IGW, NAT GW, route table-ök, asszociációk
 │   ├── ec2-instance/           # key pair, IAM role (SSM), security group, privát EC2-k
 │   └── bastion/                # bastion security group + bastion hostok
-├── versions.tf                 # Terraform és provider verziók, provider + default_tags
+├── versions.tf                 # Terraform és provider verziók
+├── providers.tf                # AWS provider + default_tags (Project, ManagedBy, Owner)
 ├── backend.tf                  # S3 backend (partial configuration)
 ├── variables.tf                # root változók validációkkal
 ├── locals.tf                   # adattranszformációk (kulcsfájl beolvasása, jump host)

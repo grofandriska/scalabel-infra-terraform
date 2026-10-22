@@ -15,3 +15,6 @@ backend.hcl
 # Privát kulcsok
 *.pem
 *.key
+
+# Szerkesztő mentési fájlok
+*~
